@@ -1,11 +1,5 @@
 import { DomainError } from '../../shared/errors';
 
-export class BuyerRequiredError extends DomainError {
-  constructor() {
-    super('BUYER_REQUIRED', 'A buyer account is required to calculate a quote');
-  }
-}
-
 export class DuplicateProductError extends DomainError {
   constructor() {
     super('DUPLICATE_PRODUCT', 'Each product may appear only once in a quote');

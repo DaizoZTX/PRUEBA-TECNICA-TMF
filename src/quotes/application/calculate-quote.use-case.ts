@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { BuyerRequiredError } from '../../shared/errors';
 import { Viewer } from '../../shared/viewer';
-import { BuyerRequiredError } from '../domain/quote.errors';
 import { Quote, QuoteItemInput } from '../domain/quote.model';
 import { QUOTE_PRICE_SOURCE, QuotePriceSource } from '../domain/quote-price-source.port';
 import { buildQuote } from '../domain/quote-pricing';
