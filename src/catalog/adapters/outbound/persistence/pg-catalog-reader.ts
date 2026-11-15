@@ -31,7 +31,6 @@ interface PriceTierRow {
   unitPriceCents: number;
 }
 
-/** Escapes LIKE wildcards so user text is matched literally. */
 function toLikePattern(text: string | undefined): string | null {
   const trimmed = text?.trim();
   if (!trimmed) {
@@ -71,10 +70,6 @@ function toPricedItem(row: PricedRow): PricedCatalogItem {
 export class PgCatalogReader implements CatalogReader {
   constructor(@Inject(PG_POOL) private readonly pool: Pool) {}
 
-  /**
-   * Public query: no price_tiers join and no stock column.
-   * A guest cannot receive prices or stock from this method, by construction.
-   */
   async searchPublic(filters: CatalogFilters): Promise<PublicCatalogItem[]> {
     const { rows } = await this.pool.query<PublicRow>(
       `SELECT id, sku, technical_name, brand, specs
@@ -90,10 +85,6 @@ export class PgCatalogReader implements CatalogReader {
     return rows.map(toPublicItem);
   }
 
-  /**
-   * Priced query: the only price data joined is the tiers of the given level.
-   * Price range filters apply to tiers of that level, never to other levels.
-   */
   async searchPriced(
     level: AuthenticatedRole,
     filters: CatalogFilters & PriceRangeFilter,

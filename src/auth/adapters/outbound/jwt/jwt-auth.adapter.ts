@@ -14,7 +14,6 @@ function isAuthenticatedRole(value: unknown): value is AuthenticatedRole {
   return typeof value === 'string' && (AUTHENTICATED_ROLES as readonly string[]).includes(value);
 }
 
-/** Converts verified JWT claims into a buyer viewer. Anything unexpected is an invalid token. */
 function toBuyerViewer(claims: unknown): Viewer {
   if (typeof claims !== 'object' || claims === null) {
     throw new InvalidTokenError();

@@ -7,11 +7,9 @@ import { AppModule } from './app.module';
 
 const API_GLOBAL_PREFIX = 'api';
 const DEFAULT_PORT = 3000;
-// The largest legitimate body is a quote with 50 lines; 10 kB leaves ample room.
 const JSON_BODY_LIMIT = '10kb';
 
 async function bootstrap(): Promise<void> {
-  // The body parser is configured below, so its default limit does not apply.
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { bodyParser: false });
 
   app.useBodyParser('json', { limit: JSON_BODY_LIMIT });
