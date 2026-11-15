@@ -1,0 +1,25 @@
+meta {
+  name: Q11 Dos productos suman 43200 + 19000 = 62200
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/quotes/calculate
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{tokenMinorista}}
+}
+
+body:json {
+  {"items":[{"productId":"{{productoTor}}","quantity":60},{"productId":"{{productoTal}}","quantity":2}]}
+}
+
+assert {
+  res.status: eq 200
+  res.body.totalCents: eq 62200
+}

@@ -1,0 +1,25 @@
+meta {
+  name: Q10 MOQ exacto (2 de 2) para TAL-002 se acepta
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/quotes/calculate
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{tokenMinorista}}
+}
+
+body:json {
+  {"items":[{"productId":"{{productoTal}}","quantity":2}]}
+}
+
+assert {
+  res.status: eq 200
+  res.body.totalCents: eq 19000
+}

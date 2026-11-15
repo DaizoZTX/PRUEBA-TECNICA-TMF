@@ -1,0 +1,20 @@
+meta {
+  name: A01 Token con firma alterada es 401
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/catalog/products
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{tokenMinorista}}x
+}
+
+assert {
+  res.status: eq 401
+  res.body.code: eq INVALID_TOKEN
+}

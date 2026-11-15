@@ -1,0 +1,16 @@
+meta {
+  name: C05 Invitado busca por texto TOR
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/catalog/products?text=TOR
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.items[0].sku: isDefined
+}

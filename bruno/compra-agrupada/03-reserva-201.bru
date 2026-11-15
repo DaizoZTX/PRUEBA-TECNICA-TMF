@@ -1,0 +1,27 @@
+meta {
+  name: G10 Primera reserva es 201 (ejecutar primero)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/group-buying/{{lotId}}/reserve
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{tokenMinorista}}
+  Idempotency-Key: demo-clave-001
+}
+
+body:json {
+  {"quantity":10}
+}
+
+assert {
+  res.status: eq 201
+  res.body.replayed: eq false
+  res.body.reservation.quantity: eq 10
+}

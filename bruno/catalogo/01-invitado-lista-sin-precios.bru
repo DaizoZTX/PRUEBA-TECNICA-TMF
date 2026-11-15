@@ -1,0 +1,19 @@
+meta {
+  name: C01-C04 Invitado lista sin precios ni stock
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/catalog/products
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.items[0].sku: isDefined
+  res.body.items[0].stock: isUndefined
+  res.body.items[0].moq: isUndefined
+  res.body.items[0].tiers: isUndefined
+}

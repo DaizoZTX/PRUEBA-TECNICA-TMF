@@ -1,0 +1,26 @@
+meta {
+  name: G11 Mismo reintento es 200 replayed (ejecutar despues de 03)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/group-buying/{{lotId}}/reserve
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{tokenMinorista}}
+  Idempotency-Key: demo-clave-001
+}
+
+body:json {
+  {"quantity":10}
+}
+
+assert {
+  res.status: eq 200
+  res.body.replayed: eq true
+}

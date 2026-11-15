@@ -1,0 +1,19 @@
+meta {
+  name: A04 Token firmado con rol GUEST es 401 (generar con: node scripts/forge-token.js guest-role)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/catalog/products
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{tokenForjadoGuest}}
+}
+
+assert {
+  res.status: eq 401
+}

@@ -1,0 +1,19 @@
+meta {
+  name: A08 Token sin firma (alg none) es 401 (generar con: node scripts/forge-token.js alg-none)
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/catalog/products
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{tokenAlgNone}}
+}
+
+assert {
+  res.status: eq 401
+}

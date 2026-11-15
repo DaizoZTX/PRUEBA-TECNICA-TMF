@@ -1,0 +1,25 @@
+meta {
+  name: Q08 Cantidad bajo el MOQ (9 de 10) es rechazada
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/quotes/calculate
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{tokenMinorista}}
+}
+
+body:json {
+  {"items":[{"productId":"{{productoTor}}","quantity":9}]}
+}
+
+assert {
+  res.status: eq 422
+  res.body.code: eq BELOW_MOQ
+}

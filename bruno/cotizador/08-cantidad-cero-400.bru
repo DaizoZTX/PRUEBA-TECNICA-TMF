@@ -1,0 +1,24 @@
+meta {
+  name: Q17 Cantidad 0 es validación 400
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/api/quotes/calculate
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{tokenMinorista}}
+}
+
+body:json {
+  {"items":[{"productId":"{{productoTor}}","quantity":0}]}
+}
+
+assert {
+  res.status: eq 400
+}

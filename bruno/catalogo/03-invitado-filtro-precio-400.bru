@@ -1,0 +1,16 @@
+meta {
+  name: C08 Invitado con filtro de precio es rechazado
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/catalog/products?minPrice=5
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 400
+  res.body.code: eq PRICE_FILTER_NOT_ALLOWED
+}

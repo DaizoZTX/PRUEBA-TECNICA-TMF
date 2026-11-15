@@ -1,0 +1,26 @@
+meta {
+  name: G12 Misma clave con otra cantidad es 422
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/group-buying/{{lotId}}/reserve
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{tokenMinorista}}
+  Idempotency-Key: demo-clave-001
+}
+
+body:json {
+  {"quantity":11}
+}
+
+assert {
+  res.status: eq 422
+  res.body.code: eq IDEMPOTENCY_KEY_REUSED
+}

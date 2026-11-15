@@ -1,0 +1,20 @@
+meta {
+  name: C25 Rango 6-6 USD: minorista no encuentra TOR (su tramo mínimo es 7.20)
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/catalog/products?minPrice=6&maxPrice=6
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{tokenMinorista}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.items: isEmpty
+}

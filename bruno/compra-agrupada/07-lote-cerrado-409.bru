@@ -1,0 +1,26 @@
+meta {
+  name: G18 Lote cerrado es 409 (requiere lote cerrado creado en la guia)
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/group-buying/{{lotCerradoId}}/reserve
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{tokenMinorista}}
+  Idempotency-Key: {{$randomUUID}}
+}
+
+body:json {
+  {"quantity":1}
+}
+
+assert {
+  res.status: eq 409
+  res.body.code: eq LOT_NOT_ACTIVE
+}

@@ -1,0 +1,15 @@
+meta {
+  name: C10 Limit mayor a 100 es rechazado
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/catalog/products?limit=101
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 400
+}

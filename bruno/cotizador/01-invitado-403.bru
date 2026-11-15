@@ -1,0 +1,24 @@
+meta {
+  name: Q01 Invitado no puede cotizar
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/quotes/calculate
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {"items":[{"productId":"{{productoTor}}","quantity":10}]}
+}
+
+assert {
+  res.status: eq 403
+  res.body.code: eq BUYER_REQUIRED
+}

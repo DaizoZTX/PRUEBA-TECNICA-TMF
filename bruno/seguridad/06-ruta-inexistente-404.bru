@@ -1,0 +1,15 @@
+meta {
+  name: H01 Ruta inexistente es 404
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/no-existe
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+}

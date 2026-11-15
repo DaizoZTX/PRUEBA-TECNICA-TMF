@@ -1,0 +1,22 @@
+meta {
+  name: C15 Minorista ve sus propios tramos y stock
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/catalog/products?text=TOR
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{tokenMinorista}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.items[0].stock: isDefined
+  res.body.items[0].tiers[0].unitPriceCents: eq 850
+  res.body.items[0].tiers[1].unitPriceCents: eq 720
+}

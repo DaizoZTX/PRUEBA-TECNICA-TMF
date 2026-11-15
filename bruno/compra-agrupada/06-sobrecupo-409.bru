@@ -1,0 +1,26 @@
+meta {
+  name: G14 Sobrecupo es 409 (90 unidades sobre 10 reservadas + otras)
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/group-buying/{{lotId}}/reserve
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{tokenFabricante}}
+  Idempotency-Key: {{$randomUUID}}
+}
+
+body:json {
+  {"quantity":95}
+}
+
+assert {
+  res.status: eq 409
+  res.body.code: eq CAPACITY_EXCEEDED
+}

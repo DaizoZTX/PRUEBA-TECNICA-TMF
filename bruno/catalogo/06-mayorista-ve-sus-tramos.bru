@@ -1,0 +1,21 @@
+meta {
+  name: C19 Mayorista ve 780 y 660, no los de minorista
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/catalog/products?text=TOR
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{tokenMayorista}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.items[0].tiers[0].unitPriceCents: eq 780
+  res.body.items[0].tiers[1].unitPriceCents: eq 660
+}

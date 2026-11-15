@@ -1,0 +1,25 @@
+meta {
+  name: Q13 Producto inexistente es 404
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/quotes/calculate
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{tokenMinorista}}
+}
+
+body:json {
+  {"items":[{"productId":"{{productoInexistente}}","quantity":10}]}
+}
+
+assert {
+  res.status: eq 404
+  res.body.code: eq PRODUCT_NOT_FOUND
+}
