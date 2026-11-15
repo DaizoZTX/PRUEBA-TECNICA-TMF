@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InvalidTokenError } from '../../../../shared/errors';
+import { UUID_FORMAT } from '../../../../shared/validation/uuid';
 import { AuthenticatedRole, ROLES, Viewer } from '../../../../shared/viewer';
 import { AuthPort } from '../../../domain/auth.port';
 
 const JWT_ALGORITHM = 'HS256';
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const AUTHENTICATED_ROLES: readonly AuthenticatedRole[] = ROLES.filter(
   (role): role is AuthenticatedRole => role !== 'GUEST',
 );
@@ -14,17 +14,16 @@ function isAuthenticatedRole(value: unknown): value is AuthenticatedRole {
   return typeof value === 'string' && (AUTHENTICATED_ROLES as readonly string[]).includes(value);
 }
 
-function toBuyerViewer(claims: unknown): Viewer { 
+/** Converts verified JWT claims into a buyer viewer. Anything unexpected is an invalid token. */
+function toBuyerViewer(claims: unknown): Viewer {
   if (typeof claims !== 'object' || claims === null) {
     throw new InvalidTokenError();
   }
 
   const { sub, role } = claims as { sub?: unknown; role?: unknown };
- 
-  if (typeof sub !== 'string' || !UUID_PATTERN.test(sub)) {
-      throw new InvalidTokenError();
+  if (typeof sub !== 'string' || !UUID_FORMAT.test(sub)) {
+    throw new InvalidTokenError();
   }
-  
   if (!isAuthenticatedRole(role)) {
     throw new InvalidTokenError();
   }
@@ -34,7 +33,7 @@ function toBuyerViewer(claims: unknown): Viewer {
 
 @Injectable()
 export class JwtAuthAdapter implements AuthPort {
-  constructor(private readonly jwtService: JwtService) { }
+  constructor(private readonly jwtService: JwtService) {}
 
   async resolveViewer(bearerToken: string | undefined): Promise<Viewer> {
     if (!bearerToken) {
@@ -53,4 +52,3 @@ export class JwtAuthAdapter implements AuthPort {
     return toBuyerViewer(claims);
   }
 }
-

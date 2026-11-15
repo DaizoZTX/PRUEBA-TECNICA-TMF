@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { after, before, describe, it } from 'node:test';
 import { Pool } from 'pg';
 import { PgCatalogReader } from '../../src/catalog/adapters/outbound/persistence/pg-catalog-reader';
+import { createTestPool, prepareTestDatabase } from '../helpers/test-database';
 
 // Uses the seeded data (see scripts/seed.ts). TOR-001 prices:
 //   NIVEL_2_MINORISTA: 850 / 720 cents   NIVEL_0_FABRICANTE: 600 / 540 cents
@@ -12,15 +13,9 @@ describe('Catalog privacy wall (integration)', () => {
   let pool: Pool;
   let reader: PgCatalogReader;
 
-  before(() => {
-    process.loadEnvFile('.env');
-    pool = new Pool({
-      host: process.env.DB_HOST,
-      port: Number(process.env.DB_PORT),
-      user: process.env.POSTGRES_USER,
-      password: process.env.POSTGRES_PASSWORD,
-      database: process.env.POSTGRES_DB,
-    });
+  before(async () => {
+    await prepareTestDatabase();
+    pool = createTestPool();
     reader = new PgCatalogReader(pool);
   });
 

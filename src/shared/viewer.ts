@@ -5,7 +5,7 @@ export const ROLES = [
   'NIVEL_0_FABRICANTE',
 ] as const;
 
-export type Role = (typeof ROLES)[number]; 
+export type Role = (typeof ROLES)[number];
 export type AuthenticatedRole = Exclude<Role, 'GUEST'>;
 
 export type Viewer =

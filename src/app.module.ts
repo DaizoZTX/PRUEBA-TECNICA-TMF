@@ -1,15 +1,12 @@
 import { Module } from '@nestjs/common';
-
-// Modulos
-import { DatabaseModule } from './database/database.module';
+import { APP_FILTER } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { CatalogModule } from './catalog/catalog.module';
-import { QuotesModule } from './quotes/quotes.module';
+import { DatabaseModule } from './database/database.module';
 import { GroupBuyingModule } from './group-buying/group-buying.module';
+import { QuotesModule } from './quotes/quotes.module';
 import { HttpErrorFilter } from './shared/http/http-error.filter';
-import { APP_FILTER } from '@nestjs/core';
-
 
 @Module({
   imports: [
@@ -22,5 +19,4 @@ import { APP_FILTER } from '@nestjs/core';
   ],
   providers: [{ provide: APP_FILTER, useClass: HttpErrorFilter }],
 })
-
 export class AppModule {}

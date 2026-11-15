@@ -1,4 +1,5 @@
-import { Client } from 'pg';
+import { Client, ClientConfig } from 'pg';
+import { loadDbConfig } from './lib/db-config';
 
 const PRICE_LEVELS = ['NIVEL_0_FABRICANTE', 'NIVEL_1_MAYORISTA', 'NIVEL_2_MINORISTA'] as const;
 type PriceLevel = (typeof PRICE_LEVELS)[number];
@@ -102,14 +103,6 @@ const SEED_LOT: SeedLot = {
   totalCapacity: 100,
 };
 
-function requiredEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`Missing environment variable: ${name}`);
-  }
-  return value;
-}
-
 async function insertProduct(client: Client, product: SeedProduct): Promise<void> {
   await client.query(
     `INSERT INTO products (id, sku, technical_name, brand, specs, moq, stock)
@@ -160,16 +153,9 @@ async function insertLot(client: Client, lot: SeedLot): Promise<void> {
   );
 }
 
-async function main(): Promise<void> {
-  process.loadEnvFile('.env');
-
-  const client = new Client({
-    host: requiredEnv('DB_HOST'),
-    port: Number(requiredEnv('DB_PORT')),
-    user: requiredEnv('POSTGRES_USER'),
-    password: requiredEnv('POSTGRES_PASSWORD'),
-    database: requiredEnv('POSTGRES_DB'),
-  });
+/** Loads the demo catalog and lot in one transaction. Safe to run repeatedly. */
+export async function runSeed(config: ClientConfig): Promise<void> {
+  const client = new Client(config);
 
   await client.connect();
   try {
@@ -180,7 +166,6 @@ async function main(): Promise<void> {
     }
     await insertLot(client, SEED_LOT);
     await client.query('COMMIT');
-    console.log(`seed loaded: ${PRODUCTS.length} products, 1 group-buy lot`);
   } catch (error) {
     await client.query('ROLLBACK');
     throw error;
@@ -189,7 +174,12 @@ async function main(): Promise<void> {
   }
 }
 
-void main().catch((error: unknown) => {
-  console.error(error);
-  process.exit(1);
-});
+if (require.main === module) {
+  process.loadEnvFile('.env');
+  runSeed(loadDbConfig())
+    .then(() => console.log(`seed loaded: ${PRODUCTS.length} products, 1 group-buy lot`))
+    .catch((error: unknown) => {
+      console.error(error);
+      process.exit(1);
+    });
+}

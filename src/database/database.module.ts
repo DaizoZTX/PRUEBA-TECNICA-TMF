@@ -19,9 +19,9 @@ import { PgPoolLifecycle } from './pg-pool.lifecycle';
           database: config.getOrThrow<string>('POSTGRES_DB'),
           max: DB_POOL_MAX_CONNECTIONS,
         }),
-    }, PgPoolLifecycle
+    },
+    PgPoolLifecycle,
   ],
   exports: [PG_POOL],
 })
-
 export class DatabaseModule {}

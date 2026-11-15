@@ -1,17 +1,11 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { Client } from 'pg';
+import { Client, ClientConfig } from 'pg';
+import { loadDbConfig } from './lib/db-config';
 
 const MIGRATIONS_DIR = join(__dirname, '..', 'migrations');
+// Any fixed number works; every run uses the same one so only one migration runs at a time.
 const MIGRATIONS_LOCK_ID = 727272;
-
-function requiredEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`Missing environment variable: ${name}`);
-  }
-  return value;
-}
 
 async function listMigrationFiles(): Promise<string[]> {
   const entries = await readdir(MIGRATIONS_DIR);
@@ -33,16 +27,10 @@ async function applyMigration(client: Client, fileName: string): Promise<void> {
   }
 }
 
-async function main(): Promise<void> {
-  process.loadEnvFile('.env');
-
-  const client = new Client({
-    host: requiredEnv('DB_HOST'),
-    port: Number(requiredEnv('DB_PORT')),
-    user: requiredEnv('POSTGRES_USER'),
-    password: requiredEnv('POSTGRES_PASSWORD'),
-    database: requiredEnv('POSTGRES_DB'),
-  });
+/** Applies every pending migration in order. Returns the names applied in this run. */
+export async function runMigrations(config: ClientConfig): Promise<string[]> {
+  const client = new Client(config);
+  const applied: string[] = [];
 
   await client.connect();
   try {
@@ -61,15 +49,20 @@ async function main(): Promise<void> {
       );
       if (rowCount === 0) {
         await applyMigration(client, fileName);
+        applied.push(fileName);
       }
     }
   } finally {
     await client.query('SELECT pg_advisory_unlock($1)', [MIGRATIONS_LOCK_ID]);
     await client.end();
   }
+  return applied;
 }
 
-void main().catch((error: unknown) => {
-  console.error(error);
-  process.exit(1);
-});
+if (require.main === module) {
+  process.loadEnvFile('.env');
+  runMigrations(loadDbConfig()).catch((error: unknown) => {
+    console.error(error);
+    process.exit(1);
+  });
+}
