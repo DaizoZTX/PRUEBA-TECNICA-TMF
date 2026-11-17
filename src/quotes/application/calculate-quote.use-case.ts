@@ -18,6 +18,8 @@ export class CalculateQuoteUseCase {
       items.map((item) => item.productId),
       viewer.role,
     );
-    return buildQuote(products, items);
+    return buildQuote(products, items, viewer);
   }
 }
+
+
