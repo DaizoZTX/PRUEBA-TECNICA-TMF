@@ -26,6 +26,7 @@ export interface QuoteLine {
   readonly tier: TierPrice;
   readonly unitPriceCents: number;
   readonly subtotalCents: number;
+  readonly discount_percent: number;
 }
 
 export interface Quote {

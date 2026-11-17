@@ -4,7 +4,9 @@ import {
   NoPriceForLevelError,
   ProductNotFoundError,
 } from './quote.errors';
+import { BuyerRequiredError } from '../../shared/errors';
 import { Quote, QuotableProduct, QuoteItemInput, QuoteLine, TierPrice } from './quote.model';
+import { Viewer } from '../../shared/viewer';
 
 /**
  * Picks the tier whose range contains the quantity.
@@ -16,6 +18,7 @@ export function selectTier(tiers: readonly TierPrice[], quantity: number): TierP
       quantity >= candidate.minQty &&
       (candidate.maxQty === null || quantity <= candidate.maxQty),
   );
+
   if (!tier) {
     throw new NoPriceForLevelError();
   }
@@ -23,12 +26,21 @@ export function selectTier(tiers: readonly TierPrice[], quantity: number): TierP
 }
 
 /** Prices one product line. All amounts are integer cents. */
-export function priceLine(product: QuotableProduct, quantity: number): QuoteLine {
+export function priceLine(product: QuotableProduct, role: string, quantity: number): QuoteLine {
   if (quantity < product.moq) {
     throw new BelowMoqError(product.sku, product.moq);
   }
 
   const tier = selectTier(product.tiers, quantity);
+  const discount_percent = 5;
+  let price = tier.unitPriceCents;
+  let discount = 0;
+
+  if (quantity >= 3 && role === 'NIVEL_1_MAYORISTA') {
+    price = price *  (1 - discount_percent / 100);
+    discount = 5;
+  }
+
   return {
     productId: product.id,
     sku: product.sku,
@@ -36,7 +48,8 @@ export function priceLine(product: QuotableProduct, quantity: number): QuoteLine
     quantity,
     tier,
     unitPriceCents: tier.unitPriceCents,
-    subtotalCents: quantity * tier.unitPriceCents,
+    subtotalCents: quantity * price,
+    discount_percent: discount,
   };
 }
 
@@ -44,9 +57,15 @@ export function priceLine(product: QuotableProduct, quantity: number): QuoteLine
 export function buildQuote(
   products: readonly QuotableProduct[],
   items: readonly QuoteItemInput[],
+  viewer: Viewer
 ): Quote {
+  if (viewer.kind === 'guest') {
+    throw new BuyerRequiredError();
+  }
+
   const productsById = new Map(products.map((product) => [product.id, product]));
-  const seenProductIds = new Set<string>();
+  const seenProductIds = new Set<string>()
+  const role = viewer.role;
 
   const lines = items.map((item) => {
     if (seenProductIds.has(item.productId)) {
@@ -58,7 +77,8 @@ export function buildQuote(
     if (!product) {
       throw new ProductNotFoundError(item.productId);
     }
-    return priceLine(product, item.quantity);
+
+    return priceLine(product, role, item.quantity);
   });
 
   const totalCents = lines.reduce((sum, line) => sum + line.subtotalCents, 0);
